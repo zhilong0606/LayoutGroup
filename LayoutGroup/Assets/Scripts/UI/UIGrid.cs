@@ -100,9 +100,9 @@ public class UIGrid : UILayoutGroup
     {
         if (axis == 0)
         {
-            for (int i = 0; i < itemList.Count; i++)
+            for (int i = 0; i < elementList.Count; i++)
             {
-                UILayoutGroupElement element = itemList[i];
+                UILayoutGroupElement element = elementList[i];
                 RectTransform rect = element.transform as RectTransform;
 
                 m_tracker.Add(this, rect,
@@ -172,9 +172,9 @@ public class UIGrid : UILayoutGroup
                 GetStartOffset(1, requiredSpace.y)
                 );
 
-        for (int i = 0; i < itemList.Count; i++)
+        for (int i = 0; i < elementList.Count; i++)
         {
-            UILayoutGroupElement element = itemList[i];
+            UILayoutGroupElement element = elementList[i];
             int index = element.index;
             int positionX;
             int positionY;
@@ -194,8 +194,8 @@ public class UIGrid : UILayoutGroup
             if (cornerY == 1)
                 positionY = actualCellCountY - 1 - positionY;
 
-            SetChildAlongAxis(itemList[i].transform as RectTransform, 0, startOffset.x + (cellSize[0] + spacing[0]) * positionX, cellSize[0]);
-            SetChildAlongAxis(itemList[i].transform as RectTransform, 1, startOffset.y + (cellSize[1] + spacing[1]) * positionY, cellSize[1]);
+            SetChildAlongAxis(elementList[i].transform as RectTransform, 0, startOffset.x + (cellSize[0] + spacing[0]) * positionX, cellSize[0]);
+            SetChildAlongAxis(elementList[i].transform as RectTransform, 1, startOffset.y + (cellSize[1] + spacing[1]) * positionY, cellSize[1]);
         }
     }
 }

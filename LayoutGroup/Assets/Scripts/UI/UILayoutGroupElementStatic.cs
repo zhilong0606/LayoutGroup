@@ -14,8 +14,8 @@ public class UILayoutGroupElementStatic : UILayoutGroupElement
 
     public enum EIndexType
     {
+        Custom,
         Head,
         Tail,
-        Custom,
     }
 }

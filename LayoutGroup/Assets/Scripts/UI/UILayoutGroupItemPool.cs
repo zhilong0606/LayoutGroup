@@ -21,10 +21,13 @@ public class UILayoutGroupItemPool : MonoBehaviour
     private List<UILayoutGroupItem> m_releasedItemList = new List<UILayoutGroupItem>();
     private FuncOnSetLayoutGroupItem m_funcOnSetLayoutGroupItem;
     private bool m_needPrefabHide = false;
+    private int m_applyCount;
 
     public void Init(FuncOnSetLayoutGroupItem funcOnSetLayoutGroupItem)
     {
         m_funcOnSetLayoutGroupItem = funcOnSetLayoutGroupItem;
+        m_layoutGroup.RegisterCheckRefreshLayoutGroup(OnCheckRefreshLayoutGroup);
+        m_layoutGroup.RegisterRefreshDenamic(OnRefreshDynamic);
         HideAllPrefab();
     }
 
@@ -36,21 +39,9 @@ public class UILayoutGroupItemPool : MonoBehaviour
     
     public void Apply(int count)
     {
+        m_applyCount = count;
         ReleaseAllDynamicItem();
-        m_layoutGroup.RefreshElementList();
-        for (int i = 0, index = 0; i < count; ++i)
-        {
-            while (m_layoutGroup.ContainsStaticIndex(index))
-            {
-                index++;
-            }
-            UILayoutGroupItem item = SetLayoutGroupItem(index, i);
-            if (item != null)
-            {
-                item.element.index = index;
-            }
-            index++;
-        }
+        m_layoutGroup.RefreshElementList(true);
     }
 
     public T GetLayoutGroupItem<T>(int prefabIndex = 0) where T : UILayoutGroupItem
@@ -84,6 +75,26 @@ public class UILayoutGroupItemPool : MonoBehaviour
         }
         m_usingItemList.Add(item);
         return item;
+    }
+
+    private bool OnCheckRefreshLayoutGroup()
+    {
+        return false;
+    }
+
+    private void OnRefreshDynamic(int obj)
+    {
+        for (int i = 0, index = 0; i < m_applyCount; ++i)
+        {
+            index = m_layoutGroup.GetUnUsedIndex(index);
+            UILayoutGroupItem item = SetLayoutGroupItem(index, i);
+            if (item != null)
+            {
+                m_layoutGroup.RecordIndex(index);
+                item.element.index = index;
+            }
+            index++;
+        }
     }
 
     private void ReleaseAllDynamicItem()
@@ -157,7 +168,7 @@ public class UILayoutGroupItemPool : MonoBehaviour
         }
     }
 
-    public class ItemInitializer<T> : ItemInitializer where T : UILayoutGroupItem
+    private class ItemInitializer<T> : ItemInitializer where T : UILayoutGroupItem
     {
         private FuncOnItemInitialized<T> m_funcOnItemInitialized;
 
@@ -176,7 +187,7 @@ public class UILayoutGroupItemPool : MonoBehaviour
         }
     }
 
-    public abstract class ItemInitializer
+    private abstract class ItemInitializer
     {
         public abstract UILayoutGroupItem Initialize(GameObject go);
     }
